@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "456576840158",
+    "project_id": "discovery-moebel-app",
+    "storage_bucket": "discovery-moebel-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:456576840158:android:2e78ec838dae231628ed4f",
+        "android_client_info": {
+          "package_name": "de.moebel.discoverymoebel"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKjMVHX1fXi4Th8j03VMo9s1I8uA-5_HY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
