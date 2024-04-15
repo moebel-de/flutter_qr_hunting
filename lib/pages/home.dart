@@ -41,21 +41,60 @@ class HomePage extends StatelessWidget {
     }
   }
 
+  Widget _testLeaderBoard() {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .orderBy('totalScans', descending: true)
+          .snapshots(),
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData || snapshot.data == null) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        List<DocumentSnapshot> documents = snapshot.data!.docs;
+
+        return ListView.builder(
+          itemCount: documents.length,
+          itemBuilder: (context, index) {
+            DocumentSnapshot document = documents[index];
+            return ListTile(
+              title: Text(document['users']),
+              subtitle: Text('Score: ${document['totalScans']}'),
+              // You can add more fields as needed.
+            );
+          },
+        );
+      },
+    );
+  }
+
   Widget _laederBoard() {
     final List<String> propUser = [
-      'Test1',
-      'Test2',
-      'Test3',
-      'Test4',
-      'Test5',
-      'Test6',
-      'Test7'
+      '1 TestName1 20',
+      '2 TestName1 15',
+      '3 TestName1 10',
+      '4 TestName1 10',
+      '5 TestName1 20',
+      '6 TestName1 20',
+      '7 TestName1 10'
     ];
     return SizedBox(
-      width: 100,
-      height: 200,
-      child: Text(
-        propUser.map((user) => '$user\n').join(),
+      width: 200,
+      height: 400,
+      child: Card(
+        color: Colors.deepOrange,
+        child: Center(
+          child: Text(
+            propUser.map((user) => '$user\n').join(),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+            ),
+          ),
+        ),
       ),
     );
   }
