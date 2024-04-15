@@ -48,6 +48,7 @@ class _LoginPageState extends State<LoginPage> {
         email: _controllerEmail.text, 
         password: _controllerPassword.text,
       );
+       Navigator.pushNamedAndRemoveUntil(context, 'intro', (route) => false);
     }on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;

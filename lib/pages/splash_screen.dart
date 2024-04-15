@@ -40,7 +40,6 @@ class _SplashScreenState extends State<SplashScreen> {
         }else{
           _goToLoginPage();
         }
-
     });
   }
   
