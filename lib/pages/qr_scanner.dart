@@ -5,41 +5,37 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_qrcode_scanner/controllers/login_register_controller.dart';
 
-class QrScanner extends StatefulWidget{
+class QrScanner extends StatefulWidget {
   const QrScanner({super.key});
 
   @override
   State<QrScanner> createState() => _QrScannerState();
 }
 
-class _QrScannerState extends State<QrScanner>{
+class _QrScannerState extends State<QrScanner> {
   String _scanResult = '';
   final String _moebelPrefix = 'moebel-';
 
   final User? user = Auth().currentUser;
-  
+
   @override
-  void initState(){
+  void initState() {
     super.initState();
   }
 
   Future<void> scanCode() async {
     String barcodeScanRes;
     String checkedBarCode;
-    try{
+    try {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-        "#ff6666",
-        "Cancel",
-        true,
-        ScanMode.QR);
-        if(barcodeScanRes.startsWith(_moebelPrefix)){
-          checkedBarCode = barcodeScanRes.substring(_moebelPrefix.length);
-          sendQRCode(user?.uid ?? '', checkedBarCode);
-        }
-        else{
-          checkedBarCode = "Dont Cheat thats a wrong barcode";
-        }
-    }on PlatformException {
+          "#ff6666", "Cancel", true, ScanMode.QR);
+      if (barcodeScanRes.startsWith(_moebelPrefix)) {
+        checkedBarCode = barcodeScanRes.substring(_moebelPrefix.length);
+        sendQRCode(user?.uid ?? '', checkedBarCode);
+      } else {
+        checkedBarCode = "Dont Cheat thats a wrong barcode";
+      }
+    } on PlatformException {
       checkedBarCode = "Failed to scan the Bar Code, try again";
     }
 
@@ -51,64 +47,90 @@ class _QrScannerState extends State<QrScanner>{
   Future<void> sendQRCode(String userId, String qrCodeContent) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     CollectionReference users = firestore.collection('users');
-  
+
     DocumentReference userDoc = users.doc(userId);
 
-    QuerySnapshot querySnapshot = await userDoc.collection('scans').where('code', isEqualTo: qrCodeContent).get();
+    QuerySnapshot querySnapshot = await userDoc
+        .collection('scans')
+        .where('code', isEqualTo: qrCodeContent)
+        .get();
     DocumentSnapshot documentSnapshot = await userDoc.get();
 
-    if(!documentSnapshot.exists){
+    if (!documentSnapshot.exists) {
       await userDoc.set({
         'totalScans': 0,
-        });
+      });
     }
-  
+
     if (querySnapshot.docs.isNotEmpty) {
       return;
     }
 
-  // Add the scan to the 'scans' subcollection
+    // Add the scan to the 'scans' subcollection
     await userDoc.collection('scans').add({
       'code': qrCodeContent,
       'scanDateTime': FieldValue.serverTimestamp(), // Use server timestamp
     });
-  
+
     // Increment the total scans count
     await userDoc.update({
       'totalScans': FieldValue.increment(1),
     });
+
+    int totalScans = 1;
+    try{
+      totalScans = documentSnapshot.get('totalScans');
+    } catch (e){
+      print(e);
+    }
+
+    final playerSnapshotQuery =
+        firestore.collection("scores").where("userId", isEqualTo: userId);
+
+    final PlayerSnapShot = await playerSnapshotQuery.get();
+
+    if (PlayerSnapShot.docs.isEmpty) {
+      final user = Auth().currentUser;
+      await firestore
+          .collection("scores")
+          .doc()
+          .set({"userId": userId, "score": totalScans + 1, "email": user?.email}); // +1 because the totalScans is behind everytime we want to set the Leaderboard
+    } else {
+      final docId = PlayerSnapShot.docs[0].id;
+      await firestore
+          .collection("scores")
+          .doc(docId)
+          .update({"userId": userId, "score": totalScans + 1});
+    }
   }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return MaterialApp(
-      home:Scaffold(
-        appBar: AppBar(
-          leading: BackButton(
-          onPressed: () {
-          Navigator.pop(context);
-            },
-          ),
-          title: const Text('QrScanner')),
-        body: Builder(builder: (BuildContext context) {
-          return Container(
-            alignment: Alignment.center,
-            child: Flex(
-              direction: Axis.vertical,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                ElevatedButton(
+        home: Scaffold(
+            appBar: AppBar(
+                leading: BackButton(
                   onPressed: () {
-                    scanCode();
-                  }, 
-                  child: const Text('Scan Qr Code')
-                  ),
-                 Text(_scanResult),
-              ],
-            ),
-          );
-        })
-        )
-    );
+                    Navigator.pop(context);
+                  },
+                ),
+                title: const Text('QrScanner')),
+            body: Builder(builder: (BuildContext context) {
+              return Container(
+                alignment: Alignment.center,
+                child: Flex(
+                  direction: Axis.vertical,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    ElevatedButton(
+                        onPressed: () {
+                          scanCode();
+                        },
+                        child: const Text('Scan Qr Code')),
+                    Text(_scanResult),
+                  ],
+                ),
+              );
+            })));
   }
 }
