@@ -96,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _title() {
-    return const Text('Moebel App');
+    return Text(isLogin ? 'Login' : 'Register');
   }
 
   Widget _entryField(
@@ -107,6 +107,7 @@ class _LoginPageState extends State<LoginPage> {
       controller: controller,
       decoration: InputDecoration(
         labelText: title,
+        hintText: 'Enter your Moebel.de Email',
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -131,6 +132,7 @@ class _LoginPageState extends State<LoginPage> {
       obscureText: true,
       decoration: InputDecoration(
         labelText: title,
+        hintText: 'Enter a Password',
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -145,14 +147,6 @@ class _LoginPageState extends State<LoginPage> {
       },
     );
   }
-
-  /*Widget _submitButtonTest(){
-  return ElevatedButton(
-    onPressed:
-      isLogin ? signInWithEmailAndPassword : createUserWithEmailAndPassword,
-   child: Text(isLogin? 'login' : 'Register'),
-   );
- }*/
 
   Widget _submitButton() {
     return ElevatedButton(
@@ -180,17 +174,21 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Widget _spacer() {
+    return const SizedBox(
+      height: 20,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        leading: BackButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        shape: const Border(
+            bottom: BorderSide(color: Colors.deepOrange, width: 4)),
         title: _title(),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Form(
@@ -215,6 +213,7 @@ class _LoginPageState extends State<LoginPage> {
                     padding: const EdgeInsets.only(
                         left: 15.0, right: 15.0, top: 15, bottom: 0),
                     child: _entryFieldPw('Password', _controllerPassword)),
+                _spacer(),
                 _submitButton(),
                 _loginOrRegisterButton()
               ],

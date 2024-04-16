@@ -65,37 +65,67 @@ class _IntroScreenState extends State<IntroScreen> {
   _pages() {
     return [
       PageViewModel(
-          title: 'Page One',
+          title: 'Moin',
           bodyWidget: const Column(
             children: [
               Text(
-                  'Welcome to the app! This is a description of how it works.'),
+                "Thanks for taking part in the game. First there will be a short introduction to how everything works.\n\n "
+                "Have fun.",
+                style: TextStyle(color: Colors.black),
+                textAlign: TextAlign.center,
+              )
             ],
           ),
           image: const Center(
             child: Icon(Icons.waving_hand, size: 50.0),
           )),
       PageViewModel(
-          title: 'Page Two',
+          title: 'What?',
           bodyWidget: const Column(
             children: [
               Text(
-                  'Welcome to the app! This is a description of how it works.'),
+                "Qr hunt is a game where you have to find Qr codes that we hide in the Office. And Scann them with the App.",
+                style: TextStyle(color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
           image: const Center(
-            child: Icon(Icons.qr_code_2, size: 100.0),
+            child: Icon(Icons.qr_code, size: 100.0),
           )),
       PageViewModel(
-          title: 'Page Three',
+          title: 'Where?',
           bodyWidget: const Column(
             children: [
               Text(
-                  'Welcome to the app! This is a description of how it works.'),
+                "They are hidden in different places throughout the office. But you don't have to open cupboards or break down doors.\n\n"
+                " There will be Qr codes hidden from Tuesday to Thursday. On each day there will be new once and the old are gone",
+                style: TextStyle(color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
           image: const Center(
-            child: Icon(Icons.article_outlined, size: 100.0),
+            child: Icon(Icons.hide_image, size: 100.0),
+          )),
+      PageViewModel(
+          title: 'Why take part?',
+          bodyWidget: const Column(
+            children: [
+              Text(
+                  "There is a Price for everyone, but the First 3 will get a bigger Price\n\n"
+                  "1. 25€ Amazone gift Card + Trophy\n"
+                  "2. 15€ Amzonee gift Card\n"
+                  "3. 10€ Amazone gift Card\n"
+                  "and for the rest some guddis\n\n"
+                  "The winners will be announced on Thursday\n",
+                style: TextStyle(color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          image: const Center(
+            child: Icon(Icons.party_mode, size: 100.0),
           )),
     ];
   }

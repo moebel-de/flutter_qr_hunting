@@ -12,16 +12,14 @@ class Leaderboard extends StatelessWidget {
     await Auth().signout();
   }
 
-  _userId() {
-    String userEmail = user?.email as String;
-    List<String> parts = userEmail.split('.');
+  _getUserNames(String email) {
+    List<String> parts = email.split('.');
     if (parts.length >= 2) {
       String name = parts[0];
       String firstLetterAfterDot = parts[1].substring(0, 1).toUpperCase();
-      return Text(
-          'Moin ${name[0].toUpperCase()}${name.substring(1)}.$firstLetterAfterDot');
+      return '${name[0].toUpperCase()}${name.substring(1)}.$firstLetterAfterDot';
     } else {
-      return const Text('Invalid email format');
+      return 'Invalid email format';
     }
   }
 
@@ -40,7 +38,7 @@ class Leaderboard extends StatelessWidget {
                     .orderBy('score', descending: true)
                     .snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
@@ -54,7 +52,10 @@ class Leaderboard extends StatelessWidget {
                     return const Center(
                       child: Text('No one Started Yet'),
                     );
+                  } else if(snapshot.hasData){
+                    
                   }
+
 
                   List<DocumentSnapshot> documents = snapshot.data!.docs;
 
@@ -63,9 +64,18 @@ class Leaderboard extends StatelessWidget {
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
                       DocumentSnapshot document = documents[index];
-                      return ListTile(
-                        title: Text(document['score'].toString()),
-                        subtitle: Text('Score: ${document['email']}'),
+                      int scoreWithIndex = index + 1;
+                      return Container(
+                        decoration: const BoxDecoration(
+                            border: Border(
+                                bottom: BorderSide(color: Colors.white30))),
+                        child: ListTile(
+                          title: Text(
+                            '$scoreWithIndex. ${_getUserNames(document['email'].toString())} Points: ${document['score']}',
+                            style: const TextStyle(color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
                       );
                     },
                   );
@@ -88,17 +98,15 @@ class Leaderboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          shape: const Border(
+              bottom: BorderSide(color: Colors.deepOrange, width: 4)),
           title: const Text('Leaderboard'),
-          leading: const Icon(Icons.account_circle_rounded),
+          leading: BackButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           centerTitle: true,
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            signout();
-            Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
-          },
-          backgroundColor: Colors.deepOrange,
-          child: const Icon(Icons.logout_rounded),
         ),
         body: SizedBox(
           height: double.infinity,

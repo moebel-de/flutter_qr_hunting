@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_qrcode_scanner/controllers/login_register_controller.dart';
 
 class MoreInfoPage extends StatefulWidget {
@@ -13,11 +13,14 @@ class MoreInfoPage extends StatefulWidget {
 class _MoreInfoPageState extends State<MoreInfoPage> {
   int selectedAvatar = -1;
   final TextEditingController _controllerUsername = TextEditingController();
+
+  final User? user = Auth().currentUser;
   @override
   void initState() {
     _controllerUsername.addListener(() {
       setState(() {});
     });
+    _controllerUsername.text = _nameSuggestion();
     super.initState();
   }
 
@@ -50,7 +53,7 @@ class _MoreInfoPageState extends State<MoreInfoPage> {
               TextField(
                 controller: _controllerUsername,
                 decoration: const InputDecoration(
-                  labelText: 'UserName',
+                  labelText: 'Username',
                   hintText: 'Enter your username',
                 ),
               ),
@@ -95,6 +98,19 @@ class _MoreInfoPageState extends State<MoreInfoPage> {
         ),
       ),
     );
+  }
+
+  _nameSuggestion() {
+    String userEmail = user?.email as String;
+    List<String> parts = userEmail.split('.');
+    if (parts.length >= 2) {
+      String name = parts[0];
+      String firstLetterAfterDot = parts[1].substring(0, 1).toUpperCase();
+      return 
+          '${name[0].toUpperCase()}${name.substring(1)}.$firstLetterAfterDot';
+    } else {
+      return 'Invalid email format';
+    }
   }
 
   bool active() {

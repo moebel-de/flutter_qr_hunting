@@ -34,11 +34,22 @@ class HomePage extends StatelessWidget {
     }
   }
 
+  _getUserNames(String email) {
+    List<String> parts = email.split('.');
+    if (parts.length >= 2) {
+      String name = parts[0];
+      String firstLetterAfterDot = parts[1].substring(0, 1).toUpperCase();
+      return '${name[0].toUpperCase()}${name.substring(1)}.$firstLetterAfterDot';
+    } else {
+      return 'Invalid email format';
+    }
+  }
+
   Widget _testLeaderBoard(BuildContext context) {
     return Column(
       children: [
         SizedBox(
-          width: 300,
+          width: 250,
           height: 200,
           child: Card(
             color: Colors.deepOrange,
@@ -61,7 +72,8 @@ class HomePage extends StatelessWidget {
                       snapshot.data == null ||
                       snapshot.data!.docs.isEmpty) {
                     return const Center(
-                      child: Text('No one Started Yet'),
+                      child: Text('No one Started Yet\n'
+                          'Be The First one'),
                     );
                   }
 
@@ -72,10 +84,13 @@ class HomePage extends StatelessWidget {
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
                       DocumentSnapshot document = documents[index];
+                      int scoreWithIndex = index + 1;
                       return ListTile(
-                        title: Text(document['score'].toString()),
-                        subtitle: Text('Score: ${document['email']}'),
-                        // You can add more fields as needed.
+                        title: Text(
+                          '$scoreWithIndex. ${_getUserNames(document['email'].toString())} Points: ${document['score']}',
+                          style: const TextStyle(color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
                       );
                     },
                   );
@@ -84,11 +99,18 @@ class HomePage extends StatelessWidget {
             ),
           ),
         ),
-        TextButton(
+        ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor:
+                  MaterialStateProperty.all<Color>(const Color(0xFF22CAFF)),
+            ),
             onPressed: () {
               Navigator.pushNamed(context, 'leaderboard');
             },
-            child: const Text('See Full Leaderboard'))
+            child: const Text(
+              'See Full Leaderboard',
+              style: TextStyle(color: Colors.white),
+            ))
       ],
     );
   }
@@ -96,7 +118,7 @@ class HomePage extends StatelessWidget {
   Widget _userCount() {
     return SizedBox(
       height: 100,
-      width: 200,
+      width: 250,
       child: Card(
         color: Colors.deepOrange,
         child: Center(
@@ -126,7 +148,14 @@ class HomePage extends StatelessWidget {
 
   Widget _goToQrCodeScanner(BuildContext context) {
     return ElevatedButton(
-        child: const Text('Qr Scanner'),
+        style: ButtonStyle(
+          backgroundColor:
+              MaterialStateProperty.all<Color>(const Color(0xFF22CAFF)),
+        ),
+        child: const Text(
+          'Qr Scanner',
+          style: TextStyle(color: Colors.white),
+        ),
         onPressed: () {
           Navigator.pushNamed(context, 'qrscanner');
         });
@@ -142,6 +171,8 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          shape: const Border(
+              bottom: BorderSide(color: Colors.deepOrange, width: 4)),
           title: FutureBuilder(
               future: FirebaseFirestore.instance
                   .collection('users')
@@ -149,7 +180,7 @@ class HomePage extends StatelessWidget {
                   .get(),
               builder: (context, snap) {
                 final userName = snap.data?['username'] ?? '';
-                return userName.isEmpty ? _userId() : Text('Moin $userName');
+                return userName.isEmpty ? _userId() : Text('Moin $userName!');
               }),
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -159,7 +190,7 @@ class HomePage extends StatelessWidget {
                     .doc(Auth().currentUser!.uid)
                     .get(),
                 builder: (context, snap) {
-                  final int avatar = snap.data?['avatar'] ?? -1;
+                  final int avatar = snap.data?['avatar'];
                   return avatar == -1
                       ? const Icon(Icons.account_circle)
                       : Image.asset('assets/avatars/avatar_$avatar.png');
@@ -183,9 +214,14 @@ class HomePage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               _testLeaderBoard(context),
+              _spacer(),
               _userCount(),
               _spacer(),
               _goToQrCodeScanner(context),
+              // Dont know how to do it the rigth way, want the app to start a bit more at the top
+              _spacer(),
+              _spacer(),
+              _spacer(),
             ],
           ),
         ));

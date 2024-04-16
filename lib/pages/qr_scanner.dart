@@ -32,8 +32,11 @@ class _QrScannerState extends State<QrScanner> {
       if (barcodeScanRes.startsWith(_moebelPrefix)) {
         checkedBarCode = barcodeScanRes.substring(_moebelPrefix.length);
         sendQRCode(user?.uid ?? '', checkedBarCode);
+        checkedBarCode = "Your Scann Worked\n"
+            "Keep on Scanning";
       } else {
-        checkedBarCode = "Dont Cheat thats a wrong barcode";
+        checkedBarCode = "Dont try to Cheat.\n"
+            "Only our Qr Codes Work 😁";
       }
     } on PlatformException {
       checkedBarCode = "Failed to scan the Bar Code, try again";
@@ -78,9 +81,9 @@ class _QrScannerState extends State<QrScanner> {
     });
 
     int totalScans = 1;
-    try{
+    try {
       totalScans = documentSnapshot.get('totalScans');
-    } catch (e){
+    } catch (e) {
       print(e);
     }
 
@@ -91,10 +94,11 @@ class _QrScannerState extends State<QrScanner> {
 
     if (PlayerSnapShot.docs.isEmpty) {
       final user = Auth().currentUser;
-      await firestore
-          .collection("scores")
-          .doc()
-          .set({"userId": userId, "score": totalScans + 1, "email": user?.email}); // +1 because the totalScans is behind everytime we want to set the Leaderboard
+      await firestore.collection("scores").doc().set({
+        "userId": userId,
+        "score": totalScans + 1,
+        "email": user?.email
+      }); // +1 because the totalScans is behind everytime we want to set the Leaderboard
     } else {
       final docId = PlayerSnapShot.docs[0].id;
       await firestore
@@ -104,17 +108,27 @@ class _QrScannerState extends State<QrScanner> {
     }
   }
 
+  Widget _spacer() {
+    return const SizedBox(
+      height: 20,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
             appBar: AppBar(
-                leading: BackButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                title: const Text('QrScanner')),
+              shape: const Border(
+                  bottom: BorderSide(color: Colors.deepOrange, width: 4)),
+              leading: BackButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              title: const Text('QrScanner'),
+              centerTitle: true,
+            ),
             body: Builder(builder: (BuildContext context) {
               return Container(
                 alignment: Alignment.center,
@@ -123,11 +137,29 @@ class _QrScannerState extends State<QrScanner> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              const Color(0xFF22CAFF)),
+                        ),
                         onPressed: () {
                           scanCode();
                         },
-                        child: const Text('Scan Qr Code')),
-                    Text(_scanResult),
+                        child: const Text('Scan Qr Code',
+                            style: TextStyle(color: Colors.white))),
+                    _spacer(),
+                    SizedBox(
+                      height: 100,
+                      width: 200,
+                      child: Card(
+                        color: Colors.deepOrange,
+                        child: Center(
+                            child: Text(
+                          _scanResult.isEmpty ? 'Scann a Qr Code' : _scanResult,
+                          style: const TextStyle(color: Colors.white),
+                          textAlign: TextAlign.center,
+                        )),
+                      ),
+                    ),
                   ],
                 ),
               );
