@@ -142,8 +142,29 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: _userId(),
-          leading: const Icon(Icons.account_circle_rounded),
+          title: FutureBuilder(
+              future: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(Auth().currentUser!.uid)
+                  .get(),
+              builder: (context, snap) {
+                final userName = snap.data?['username'] ?? '';
+                return userName.isEmpty ? _userId() : Text('Moin $userName');
+              }),
+          leading: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: FutureBuilder(
+                future: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(Auth().currentUser!.uid)
+                    .get(),
+                builder: (context, snap) {
+                  final int avatar = snap.data?['avatar'] ?? -1;
+                  return avatar == -1
+                      ? const Icon(Icons.account_circle)
+                      : Image.asset('assets/avatars/avatar_$avatar.png');
+                }),
+          ),
           centerTitle: true,
         ),
         floatingActionButton: FloatingActionButton(

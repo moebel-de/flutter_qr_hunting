@@ -4,6 +4,7 @@ import 'package:flutter_qrcode_scanner/pages/home.dart';
 import 'package:flutter_qrcode_scanner/pages/introscreen.dart';
 import 'package:flutter_qrcode_scanner/pages/leaderboard.dart';
 import 'package:flutter_qrcode_scanner/pages/login_register_page.dart';
+import 'package:flutter_qrcode_scanner/pages/more_info_page.dart';
 import 'package:flutter_qrcode_scanner/pages/qr_scanner.dart';
 import 'package:flutter_qrcode_scanner/pages/splash_screen.dart';
 
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
         '/':(context) => const SplashScreen(),
         'home':(context) =>  HomePage(),
         'login':(context) => const LoginPage(),
+        'moreInfo': (context) => const MoreInfoPage(),
         'intro':(context) => const IntroScreen(),
         'qrscanner':(context) => const QrScanner(),
         'leaderboard':(context) => Leaderboard(),
