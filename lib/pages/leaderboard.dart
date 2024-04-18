@@ -23,6 +23,17 @@ class Leaderboard extends StatelessWidget {
     }
   }
 
+  Widget _getUserIcon(uid) {
+    return FutureBuilder(
+        future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
+        builder: (context, snap) {
+          final int avatar = snap.data?['avatar'] ?? -1;
+          return avatar == -1
+              ? const Icon(Icons.account_circle)
+              : Image.asset('assets/avatars/avatar_$avatar.png', width: 24, height: 24);
+        });
+  }
+
   Widget _leaderBoard() {
     return Column(
       children: [
@@ -52,10 +63,7 @@ class Leaderboard extends StatelessWidget {
                     return const Center(
                       child: Text('No one Started Yet'),
                     );
-                  } else if(snapshot.hasData){
-                    
                   }
-
 
                   List<DocumentSnapshot> documents = snapshot.data!.docs;
 
@@ -68,12 +76,19 @@ class Leaderboard extends StatelessWidget {
                       return Container(
                         decoration: const BoxDecoration(
                             border: Border(
-                                bottom: BorderSide(color: Colors.white30))),
+                                bottom: BorderSide(color: Colors.white30))
+                                ),
                         child: ListTile(
-                          title: Text(
-                            '$scoreWithIndex. ${_getUserNames(document['email'].toString())} Points: ${document['score']}',
-                            style: const TextStyle(color: Colors.white),
-                            textAlign: TextAlign.center,
+                          title: Row(
+                            children: [
+                              _getUserIcon(document['userId']),
+                              const SizedBox(width: 8),
+                              Text(
+                                '$scoreWithIndex. ${_getUserNames(document['email'].toString())} Points: ${document['score']}',
+                                style: const TextStyle(color: Colors.white),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ),
                         ),
                       );

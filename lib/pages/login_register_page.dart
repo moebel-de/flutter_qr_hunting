@@ -31,8 +31,6 @@ class _LoginPageState extends State<LoginPage> {
         await prefs.setBool('isFirstTime', false);
         Navigator.pushNamedAndRemoveUntil(context, 'intro', (route) => false);
       } else {
-        // Just for testing and Designing the Intro Screen
-        await prefs.setBool('isFirstTime', true);
         if (await needMoreInfo()) {
           Navigator.pushNamedAndRemoveUntil(
               context, 'moreInfo', (route) => false);

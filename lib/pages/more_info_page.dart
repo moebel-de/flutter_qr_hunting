@@ -79,7 +79,7 @@ class _MoreInfoPageState extends State<MoreInfoPage> {
                               ? Border.all(
                                   color: Colors.green,
                                   width: 5,
-                                ) // Green border when selected
+                                )
                               : null,
                           borderRadius: BorderRadius.circular(1000),
                         ),

@@ -34,6 +34,17 @@ class HomePage extends StatelessWidget {
     }
   }
 
+  Widget _getUserIcon(uid) {
+    return FutureBuilder(
+        future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
+        builder: (context, snap) {
+          final int avatar = snap.data?['avatar'] ?? -1;
+          return avatar == -1
+              ? const Icon(Icons.account_circle)
+              : Image.asset('assets/avatars/avatar_$avatar.png', width: 24, height: 24);
+        });
+  }
+
   _getUserNames(String email) {
     List<String> parts = email.split('.');
     if (parts.length >= 2) {
@@ -45,7 +56,7 @@ class HomePage extends StatelessWidget {
     }
   }
 
-  Widget _testLeaderBoard(BuildContext context) {
+  Widget _leaderBoard(BuildContext context) {
     return Column(
       children: [
         SizedBox(
@@ -86,10 +97,14 @@ class HomePage extends StatelessWidget {
                       DocumentSnapshot document = documents[index];
                       int scoreWithIndex = index + 1;
                       return ListTile(
-                        title: Text(
-                          '$scoreWithIndex. ${_getUserNames(document['email'].toString())} Points: ${document['score']}',
-                          style: const TextStyle(color: Colors.white),
-                          textAlign: TextAlign.center,
+                        title: Row(
+                          children: [
+                            _getUserIcon(document['userId']),
+                            const SizedBox(width: 8),
+                            Text('$scoreWithIndex. ${_getUserNames(document['email'].toString())} Points: ${document['score']}',
+                              style: const TextStyle(color: Colors.white),
+                              textAlign: TextAlign.center,),
+                          ]
                         ),
                       );
                     },
@@ -133,7 +148,7 @@ class HomePage extends StatelessWidget {
               }
               final scanCount = snapshot.data ?? 0;
               return Text(
-                'Your Scans: $scanCount',
+                'Your Points: $scanCount',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -176,7 +191,7 @@ class HomePage extends StatelessWidget {
           title: FutureBuilder(
               future: FirebaseFirestore.instance
                   .collection('users')
-                  .doc(Auth().currentUser!.uid)
+                  .doc(Auth().currentUser?.uid)
                   .get(),
               builder: (context, snap) {
                 final userName = snap.data?['username'] ?? '';
@@ -190,7 +205,7 @@ class HomePage extends StatelessWidget {
                     .doc(Auth().currentUser!.uid)
                     .get(),
                 builder: (context, snap) {
-                  final int avatar = snap.data?['avatar'];
+                  final int avatar = snap.data?['avatar'] ?? -1;
                   return avatar == -1
                       ? const Icon(Icons.account_circle)
                       : Image.asset('assets/avatars/avatar_$avatar.png');
@@ -213,7 +228,7 @@ class HomePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              _testLeaderBoard(context),
+              _leaderBoard(context),
               _spacer(),
               _userCount(),
               _spacer(),

@@ -84,7 +84,7 @@ class _IntroScreenState extends State<IntroScreen> {
           bodyWidget: const Column(
             children: [
               Text(
-                "Qr hunt is a game where you have to find Qr codes that we hide in the Office. And Scann them with the App.",
+                "Qr hunt is a game where you have to find Qr codes that we hide in the Office. You have to Scann them with the App to gain Points",
                 style: TextStyle(color: Colors.black),
                 textAlign: TextAlign.center,
               ),
@@ -99,7 +99,7 @@ class _IntroScreenState extends State<IntroScreen> {
             children: [
               Text(
                 "They are hidden in different places throughout the office. But you don't have to open cupboards or break down doors.\n\n"
-                " There will be Qr codes hidden from Tuesday to Thursday. On each day there will be new once and the old are gone",
+                "There will be Qr codes hidden from Tuesday to Thursday. On each day we will hide new Qr Codes and remove the old once",
                 style: TextStyle(color: Colors.black),
                 textAlign: TextAlign.center,
               ),
@@ -113,11 +113,11 @@ class _IntroScreenState extends State<IntroScreen> {
           bodyWidget: const Column(
             children: [
               Text(
-                  "There is a Price for everyone, but the First 3 will get a bigger Price\n\n"
+                  "Every one that takes part can win something\n\n"
                   "1. 25€ Amazone gift Card + Trophy\n"
                   "2. 15€ Amzonee gift Card\n"
                   "3. 10€ Amazone gift Card\n"
-                  "and for the rest some guddis\n\n"
+                  "and for the rest some small things\n\n"
                   "The winners will be announced on Thursday\n",
                 style: TextStyle(color: Colors.black),
                 textAlign: TextAlign.center,

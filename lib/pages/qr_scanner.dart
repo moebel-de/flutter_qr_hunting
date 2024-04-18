@@ -69,13 +69,11 @@ class _QrScannerState extends State<QrScanner> {
       return;
     }
 
-    // Add the scan to the 'scans' subcollection
     await userDoc.collection('scans').add({
       'code': qrCodeContent,
-      'scanDateTime': FieldValue.serverTimestamp(), // Use server timestamp
+      'scanDateTime': FieldValue.serverTimestamp(),
     });
 
-    // Increment the total scans count
     await userDoc.update({
       'totalScans': FieldValue.increment(1),
     });
@@ -98,7 +96,7 @@ class _QrScannerState extends State<QrScanner> {
         "userId": userId,
         "score": totalScans + 1,
         "email": user?.email
-      }); // +1 because the totalScans is behind everytime we want to set the Leaderboard
+      });
     } else {
       final docId = PlayerSnapShot.docs[0].id;
       await firestore
