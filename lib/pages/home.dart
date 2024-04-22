@@ -39,8 +39,7 @@ class HomePage extends StatelessWidget {
         future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
         builder: (context, snap) {
           final int avatar =
-              snap.data?['avatar'] ?? -1; // Ausnahme aufgetreten.
-          //StateError (Bad state: cannot get field "avatar" on a DocumentSnapshotPlatform which does not exist)
+              snap.data?['avatar'] ?? -1;
           return avatar == -1
               ? const Icon(Icons.account_circle)
               : Image.asset('assets/avatars/avatar_$avatar.png',
