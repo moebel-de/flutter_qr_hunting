@@ -32,8 +32,8 @@ class _QrScannerState extends State<QrScanner> {
       if (barcodeScanRes.startsWith(_moebelPrefix)) {
         checkedBarCode = barcodeScanRes.substring(_moebelPrefix.length);
         sendQRCode(user?.uid ?? '', checkedBarCode);
-        checkedBarCode = "Your Scann Worked\n"
-            "Keep on Scanning";
+        checkedBarCode = "Your Scann Worked, Keep on Scanning";
+        Navigator.pushNamed(context, 'home');
       } else {
         checkedBarCode = "Dont try to Cheat.\n"
             "Only our Qr Codes Work 😁";
@@ -92,11 +92,8 @@ class _QrScannerState extends State<QrScanner> {
 
     if (PlayerSnapShot.docs.isEmpty) {
       final user = Auth().currentUser;
-      await firestore.collection("scores").doc().set({
-        "userId": userId,
-        "score": totalScans + 1,
-        "email": user?.email
-      });
+      await firestore.collection("scores").doc().set(
+          {"userId": userId, "score": totalScans + 1, "email": user?.email});
     } else {
       final docId = PlayerSnapShot.docs[0].id;
       await firestore
@@ -137,23 +134,45 @@ class _QrScannerState extends State<QrScanner> {
                     ElevatedButton(
                         style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all<Color>(
-                              const Color(0xFF22CAFF)),
+                              const Color.fromRGBO(255, 255, 255, 1)),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18.0),
+                              side: const BorderSide(color: Color(0xFF22CAFF)),
+                            ),
+                          ),
                         ),
                         onPressed: () {
                           scanCode();
                         },
-                        child: const Text('Scan Qr Code',
-                            style: TextStyle(color: Colors.white))),
+                        child: const Wrap(
+                          children: [
+                            Icon(
+                              Icons.qr_code,
+                              color: Colors.black,
+                              size: 24.0,
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text('Open Qr Scanner',
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 20))
+                          ],
+                        )),
                     _spacer(),
                     SizedBox(
                       height: 100,
                       width: 200,
                       child: Card(
-                        color: Colors.deepOrange,
+                        color: Colors.white,
                         child: Center(
                             child: Text(
-                          _scanResult.isEmpty ? 'Scann a Qr Code' : _scanResult,
-                          style: const TextStyle(color: Colors.white),
+                          _scanResult.isEmpty
+                              ? 'You have to Scann a Qr Code'
+                              : _scanResult,
+                          style: const TextStyle(color: Colors.black),
                           textAlign: TextAlign.center,
                         )),
                       ),

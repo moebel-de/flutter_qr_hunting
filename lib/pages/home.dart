@@ -38,10 +38,13 @@ class HomePage extends StatelessWidget {
     return FutureBuilder(
         future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
         builder: (context, snap) {
-          final int avatar = snap.data?['avatar'] ?? -1;
+          final int avatar =
+              snap.data?['avatar'] ?? -1; // Ausnahme aufgetreten.
+          //StateError (Bad state: cannot get field "avatar" on a DocumentSnapshotPlatform which does not exist)
           return avatar == -1
               ? const Icon(Icons.account_circle)
-              : Image.asset('assets/avatars/avatar_$avatar.png', width: 24, height: 24);
+              : Image.asset('assets/avatars/avatar_$avatar.png',
+                  width: 24, height: 24);
         });
   }
 
@@ -97,15 +100,15 @@ class HomePage extends StatelessWidget {
                       DocumentSnapshot document = documents[index];
                       int scoreWithIndex = index + 1;
                       return ListTile(
-                        title: Row(
-                          children: [
-                            _getUserIcon(document['userId']),
-                            const SizedBox(width: 8),
-                            Text('$scoreWithIndex. ${_getUserNames(document['email'].toString())} Points: ${document['score']}',
-                              style: const TextStyle(color: Colors.white),
-                              textAlign: TextAlign.center,),
-                          ]
-                        ),
+                        title: Row(children: [
+                          _getUserIcon(document['userId']),
+                          const SizedBox(width: 8),
+                          Text(
+                            '$scoreWithIndex. ${_getUserNames(document['email'].toString())} Points: ${document['score']}',
+                            style: const TextStyle(color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
+                        ]),
                       );
                     },
                   );
@@ -115,17 +118,26 @@ class HomePage extends StatelessWidget {
           ),
         ),
         ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all<Color>(const Color(0xFF22CAFF)),
+         style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(
+              const Color.fromRGBO(255, 255, 255, 1)),
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+              side: const BorderSide(color: Color(0xFF22CAFF)),
             ),
-            onPressed: () {
-              Navigator.pushNamed(context, 'leaderboard');
-            },
-            child: const Text(
-              'See Full Leaderboard',
-              style: TextStyle(color: Colors.white),
-            ))
+          ),
+        ),
+          onPressed: () {
+            Navigator.pushNamed(context, 'leaderboard');
+          },
+          child: const Wrap(children: <Widget>[
+            Text(
+              'Full Leaderboard',
+              style: TextStyle(color: Colors.black),
+            ),
+          ]),
+        )
       ],
     );
   }
@@ -164,13 +176,29 @@ class HomePage extends StatelessWidget {
   Widget _goToQrCodeScanner(BuildContext context) {
     return ElevatedButton(
         style: ButtonStyle(
-          backgroundColor:
-              MaterialStateProperty.all<Color>(const Color(0xFF22CAFF)),
+          backgroundColor: MaterialStateProperty.all<Color>(
+              const Color.fromRGBO(255, 255, 255, 1)),
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+              side: const BorderSide(color: Color(0xFF22CAFF)),
+            ),
+          ),
         ),
-        child: const Text(
-          'Qr Scanner',
-          style: TextStyle(color: Colors.white),
-        ),
+        child: const Wrap(children: <Widget>[
+          Icon(
+            Icons.qr_code,
+            color: Colors.black,
+            size: 24.0,
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Text(
+            'Qr Scanner',
+            style: TextStyle(color: Colors.black, fontSize: 20),
+          ),
+        ]),
         onPressed: () {
           Navigator.pushNamed(context, 'qrscanner');
         });
@@ -202,7 +230,7 @@ class HomePage extends StatelessWidget {
             child: FutureBuilder(
                 future: FirebaseFirestore.instance
                     .collection('users')
-                    .doc(Auth().currentUser!.uid)
+                    .doc(Auth().currentUser?.uid)
                     .get(),
                 builder: (context, snap) {
                   final int avatar = snap.data?['avatar'] ?? -1;
