@@ -84,7 +84,7 @@ class _IntroScreenState extends State<IntroScreen> {
           bodyWidget: const Column(
             children: [
               Text(
-                "Qr hunt is a game where you have to find Qr codes that we hide in the Office. You have to Scann them with the App to gain Points",
+                "Qr hunt is a game where you have to find Qr codes that we hide in the Office. You have to Scann them with the App to be able to gain Points and win some Prices",
                 style: TextStyle(color: Colors.black),
                 textAlign: TextAlign.center,
               ),
@@ -94,7 +94,7 @@ class _IntroScreenState extends State<IntroScreen> {
             child: Icon(Icons.qr_code, size: 100.0),
           )),
       PageViewModel(
-          title: 'Where?',
+          title: 'Where to Search?',
           bodyWidget: const Column(
             children: [
               Text(
@@ -116,8 +116,7 @@ class _IntroScreenState extends State<IntroScreen> {
                   "Every one that takes part can win something\n\n"
                   "1. 25€ Amazone gift Card + Trophy\n"
                   "2. 15€ Amzonee gift Card\n"
-                  "3. 10€ Amazone gift Card\n"
-                  "and for the rest some small things\n\n"
+                  "3. 10€ Amazone gift Card\n\n"
                   "The winners will be announced on Thursday\n",
                 style: TextStyle(color: Colors.black),
                 textAlign: TextAlign.center,
