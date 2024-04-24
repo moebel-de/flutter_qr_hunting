@@ -103,7 +103,7 @@ class HomePage extends StatelessWidget {
                           _getUserIcon(document['userId']),
                           const SizedBox(width: 8),
                           Text(
-                            '$scoreWithIndex. ${_getUserNames(document['email'].toString())} Points: ${document['score']}',
+                            '$scoreWithIndex. ${_getUserNames(document['email'].toString())} P: ${document['score']}',
                             style: const TextStyle(color: Colors.white),
                             textAlign: TextAlign.center,
                           ),
