@@ -3,13 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_qrcode_scanner/controllers/login_register_controller.dart';
 
-class Userprop {
-  final String name;
-  final int scannedDocuments;
-
-  Userprop({required this.name, required this.scannedDocuments});
-}
-
 class HomePage extends StatelessWidget {
   HomePage({super.key});
 
@@ -41,29 +34,117 @@ class HomePage extends StatelessWidget {
     }
   }
 
-  Widget _laederBoard() {
-    final List<String> propUser = [
-      'Test1',
-      'Test2',
-      'Test3',
-      'Test4',
-      'Test5',
-      'Test6',
-      'Test7'
-    ];
-    return SizedBox(
-      width: 100,
-      height: 200,
-      child: Text(
-        propUser.map((user) => '$user\n').join(),
-      ),
+  Widget _getUserIcon(uid) {
+    return FutureBuilder(
+        future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
+        builder: (context, snap) {
+          final int avatar =
+              snap.data?['avatar'] ?? -1;
+          return avatar == -1
+              ? const Icon(Icons.account_circle)
+              : Image.asset('assets/avatars/avatar_$avatar.png',
+                  width: 24, height: 24);
+        });
+  }
+
+  _getUserNames(String email) {
+    List<String> parts = email.split('.');
+    if (parts.length >= 2) {
+      String name = parts[0];
+      String firstLetterAfterDot = parts[1].substring(0, 1).toUpperCase();
+      return '${name[0].toUpperCase()}${name.substring(1)}.$firstLetterAfterDot';
+    } else {
+      return 'Invalid email format';
+    }
+  }
+
+  Widget _leaderBoard(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          width: 250,
+          height: 200,
+          child: Card(
+            color: Colors.deepOrange,
+            child: Center(
+              child: StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection('scores')
+                    .orderBy('score', descending: true)
+                    .snapshots(),
+                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (snapshot.hasError) {
+                    return const Center(
+                      child: Text('Error fetching data'),
+                    );
+                  } else if (!snapshot.hasData ||
+                      snapshot.data == null ||
+                      snapshot.data!.docs.isEmpty) {
+                    return const Center(
+                      child: Text('No one Started Yet\n'
+                          'Be The First one'),
+                    );
+                  }
+
+                  List<DocumentSnapshot> documents = snapshot.data!.docs;
+
+                  return ListView.builder(
+                    itemCount: documents.length > 3 ? 3 : documents.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      DocumentSnapshot document = documents[index];
+                      int scoreWithIndex = index + 1;
+                      return ListTile(
+                        title: Row(children: [
+                          _getUserIcon(document['userId']),
+                          const SizedBox(width: 8),
+                          Text(
+                            '$scoreWithIndex. ${_getUserNames(document['email'].toString())} P: ${document['score']}',
+                            style: const TextStyle(color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
+                        ]),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+        ElevatedButton(
+         style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(
+              const Color.fromRGBO(255, 255, 255, 1)),
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+              side: const BorderSide(color: Color(0xFF22CAFF)),
+            ),
+          ),
+        ),
+          onPressed: () {
+            Navigator.pushNamed(context, 'leaderboard');
+          },
+          child: const Wrap(children: <Widget>[
+            Text(
+              'Full Leaderboard',
+              style: TextStyle(color: Colors.black),
+            ),
+          ]),
+        )
+      ],
     );
   }
 
   Widget _userCount() {
     return SizedBox(
       height: 100,
-      width: 200,
+      width: 250,
       child: Card(
         color: Colors.deepOrange,
         child: Center(
@@ -78,7 +159,7 @@ class HomePage extends StatelessWidget {
               }
               final scanCount = snapshot.data ?? 0;
               return Text(
-                'Your Scans: $scanCount',
+                'Your Points: $scanCount',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -93,7 +174,30 @@ class HomePage extends StatelessWidget {
 
   Widget _goToQrCodeScanner(BuildContext context) {
     return ElevatedButton(
-        child: const Text('Qr Scanner'),
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(
+              const Color.fromRGBO(255, 255, 255, 1)),
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+              side: const BorderSide(color: Color(0xFF22CAFF)),
+            ),
+          ),
+        ),
+        child: const Wrap(children: <Widget>[
+          Icon(
+            Icons.qr_code,
+            color: Colors.black,
+            size: 24.0,
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Text(
+            'Qr Scanner',
+            style: TextStyle(color: Colors.black, fontSize: 20),
+          ),
+        ]),
         onPressed: () {
           Navigator.pushNamed(context, 'qrscanner');
         });
@@ -109,8 +213,31 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: _userId(),
-          leading: const Icon(Icons.account_circle_rounded),
+          shape: const Border(
+              bottom: BorderSide(color: Colors.deepOrange, width: 4)),
+          title: FutureBuilder(
+              future: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(Auth().currentUser?.uid)
+                  .get(),
+              builder: (context, snap) {
+                final userName = snap.data?['username'] ?? '';
+                return userName.isEmpty ? _userId() : Text('Moin $userName!');
+              }),
+          leading: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: FutureBuilder(
+                future: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(Auth().currentUser?.uid)
+                    .get(),
+                builder: (context, snap) {
+                  final int avatar = snap.data?['avatar'] ?? -1;
+                  return avatar == -1
+                      ? const Icon(Icons.account_circle)
+                      : Image.asset('assets/avatars/avatar_$avatar.png');
+                }),
+          ),
           centerTitle: true,
         ),
         floatingActionButton: FloatingActionButton(
@@ -128,10 +255,15 @@ class HomePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              _laederBoard(),
+              _leaderBoard(context),
+              _spacer(),
               _userCount(),
               _spacer(),
               _goToQrCodeScanner(context),
+              // Dont know how to do it the rigth way, want the app to start a bit more at the top
+              _spacer(),
+              _spacer(),
+              _spacer(),
             ],
           ),
         ));
